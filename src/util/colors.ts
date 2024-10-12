@@ -1,5 +1,5 @@
 export const appColors = {
-  dark: '#08081B',
+  dark: '#000',
   purple: '#4E4AD9',
   lightPurple: '#B3B1FC',
   gray: '#272626',
