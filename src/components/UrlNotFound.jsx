@@ -3,6 +3,7 @@ import React from 'react'
 import { appColors } from '../util/colors'
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const UrlNotFound = ({ url, setHasError, setUrl }) => {
   const retrySearch = () => {
@@ -11,7 +12,7 @@ const UrlNotFound = ({ url, setHasError, setUrl }) => {
   };
 
   return (
-    <View style={styles.errorContainer}>
+    <LinearGradient colors={[appColors.purple, appColors.lightGray, appColors.dark]} style={styles.errorContainer}>
       <Ionicons name='warning' color={'yellow'} size={105} />
 
       <View>
@@ -22,7 +23,7 @@ const UrlNotFound = ({ url, setHasError, setUrl }) => {
           <Ionicons name='logo-google' color={'#fff'} size={30}/>
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   )
 }
 

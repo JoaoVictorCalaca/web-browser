@@ -3,13 +3,14 @@ import React from 'react'
 import WebView from 'react-native-webview'
 import { Ionicons } from '@expo/vector-icons'
 import { appColors } from '../util/colors'
+import { router } from 'expo-router'
 
 const TabCard = ({ url, index, closeTab }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text numberOfLines={1} style={styles.title}>{url}</Text>
-        <Pressable onPress={()=> closeTab(index)}>
+        <Pressable onPress={() => closeTab(index)}>
           <Ionicons name='close' color={appColors.dark} size={20} />
         </Pressable>
       </View>
@@ -17,7 +18,6 @@ const TabCard = ({ url, index, closeTab }) => {
         source={{ uri: url }}
         startInLoadingState={true}
         style={styles.page}
-        pointerEvents={'none'}
         scrollEnabled={false}
         javaScriptEnabled={true}
       />

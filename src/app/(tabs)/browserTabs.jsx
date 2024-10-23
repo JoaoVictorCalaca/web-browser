@@ -6,6 +6,7 @@ import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import TabCard from '@/src/components/TabCard';
 import { tabManager } from '@/src/util/manageTabs';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const imgSize = 200
 
@@ -70,7 +71,10 @@ const browserTabs = () => {
   const renderTabs = ({ item, index }) => (<TabCard url={item} closeTab={() => closeTab(index)} />);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={[appColors.purple, appColors.lightGray, appColors.dark]}
+      style={styles.container}
+    >
       <View style={styles.header}>
         <Text style={styles.defaultText}>Guias</Text>
         <View>
@@ -135,7 +139,7 @@ const browserTabs = () => {
         </View>
       </Modal>
       <StatusBar />
-    </View>
+    </LinearGradient>
   )
 }
 
@@ -159,7 +163,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: Platform.OS === 'android' ? Constants.statusBarHeight : 18,
     paddingBottom: 15,
-    backgroundColor: appColors.gray
   },
 
   defaultText: {

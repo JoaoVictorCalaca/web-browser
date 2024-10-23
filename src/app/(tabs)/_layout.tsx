@@ -12,6 +12,8 @@ export default function RootLayout() {
       tabBarActiveTintColor: appColors.purple,
       tabBarStyle: {
         backgroundColor: appColors.dark,
+        borderTopWidth: 0,
+        elevation: 0
       },
       headerShown: false,
       tabBarHideOnKeyboard: true,

@@ -4,5 +4,5 @@ export const appColors = {
   lightPurple: '#B3B1FC',
   gray: '#272626',
   lightGray: '#424143',
-  red: '#D9043D'
+  red: '#D9043D',
 }

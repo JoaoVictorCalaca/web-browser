@@ -22,9 +22,13 @@ export default function Index() {
     }
 
     const loadTabs = async () => {
-      const savedTabs = await tabManager.loadTabs();
-      if (savedTabs) {
-        setTabs(JSON.parse(savedTabs)); // Parse as JSON
+      try {
+        const savedTabs = await tabManager.loadTabs();
+        if (savedTabs) {
+          setTabs(JSON.parse(savedTabs));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar abas:', error);
       }
     };
 
