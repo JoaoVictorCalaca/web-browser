@@ -22,7 +22,7 @@ export default function Index() {
     }
 
     const loadTabs = async () => {
-      const savedTabs = await tabManager.loadTabs();
+      const {tabs: savedTabs = []} = await tabManager.loadTabs() || {};
       if (savedTabs) {
         setTabs(JSON.parse(savedTabs)); // Parse as JSON
       }

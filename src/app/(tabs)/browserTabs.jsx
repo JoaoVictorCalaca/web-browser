@@ -16,9 +16,9 @@ const browserTabs = () => {
 
   useEffect(() => {
     const loadTabs = async () => {
-      const savedTabs = await tabManager.loadTabs();
-      if (savedTabs) {
-        setTabs(JSON.parse(savedTabs));
+      const { tabs: savedTabs = [] } = await tabManager.loadTabs();
+      if (savedTabs && savedTabs.length > 0) {
+        setTabs(savedTabs);
       }
     };
 
