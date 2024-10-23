@@ -10,7 +10,7 @@ import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import { ProgressBar } from 'react-native-paper';
 import UrlNotFound from '@/src/components/UrlNotFound';
-import BottomSheetBtn from '@/src/components/BottomSheetBtn';
+import BottomSheetBtn from '@/src/components/bottomSheetBtn';
 
 const webview = () => {
   const { url } = useLocalSearchParams();
