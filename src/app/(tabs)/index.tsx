@@ -6,7 +6,7 @@ import { ImageBackground, StyleSheet, Text, TextInput, View, TouchableOpacity, S
 import { router } from "expo-router";
 import { tabManager } from "@/src/util/manageTabs";
 
-const backgrounds = [require('../../../assets/images/bg1.png'), require('../../../assets/images/bg2.jpg'), require('../../../assets/images/bg3.jpg'), require('../../../assets/images/bg4.jpg')]
+const backgrounds = [require('../../../assets/images/bg1.jpg'), require('../../../assets/images/bg2.jpg'), require('../../../assets/images/bg3.jpg'), require('../../../assets/images/bg4.jpg')]
 
 export default function Index() {
   const [bg, setBg] = useState(null)
@@ -24,11 +24,11 @@ export default function Index() {
     const loadTabs = async () => {
       const {tabs: savedTabs = []} = await tabManager.loadTabs() || {};
       if (savedTabs) {
-        setTabs(JSON.parse(savedTabs)); // Parse as JSON
+        setTabs(JSON.parse(savedTabs));
       }
     };
 
-    loadTabs
+    loadTabs()
     handleBg()
   }, [])
 
@@ -39,14 +39,12 @@ export default function Index() {
   }
 
   const isValidUrl = (url: string) => {
-    const pattern = new RegExp(
-      '^(https?:\\/\\/)?' +
-      '((([a-z0-9\\-]+)\\.)+[a-z]{2,}|localhost|' +
-      '((\\d{1,3}\\.){3}\\d{1,3}))' +
-      '(\\:\\d+)?(\\/[-a-z0-9@:%_\\+.~#?&//=]*)?$',
-      'i'
-    );
-    return pattern.test(url);
+    try {
+      new URL(url);
+      return true;
+    } catch (_) {
+      return false;
+    }
   };
 
   const toggleSwitch = () => {
@@ -54,23 +52,12 @@ export default function Index() {
   }
 
   const handleSearch = async () => {
-    if (isValidUrl(query)) {
-      const newTabs = [...tabs, query];
-      setTabs(newTabs);
+    const searchUrl = isValidUrl(query) ? query : `https://google.com/search?q=${query}`;
+    const newTabs = [...tabs, searchUrl];
+    setTabs(newTabs);
+    await tabManager.saveTabs(newTabs);
 
-      await tabManager.saveTabs(newTabs);
-
-      router.push({ pathname: './webview', params: { url: query } });
-    } else {
-      const googleSearchUrl = `google.com/search?q=${query}`;
-
-      const newTabs = [...tabs, googleSearchUrl];
-      setTabs(newTabs);
-
-      await tabManager.saveTabs(newTabs);
-
-      router.push({ pathname: './webview', params: { url: googleSearchUrl } });
-    }
+    router.push({ pathname: './webview', params: { url: searchUrl } });
   };
 
 
@@ -108,7 +95,7 @@ export default function Index() {
         </View>
       </View>
 
-      <StatusBar style='light' translucent={true} />
+      <StatusBar style='auto' translucent={true} />
     </ImageBackground>
   );
 }

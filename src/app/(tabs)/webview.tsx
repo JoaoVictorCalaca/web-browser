@@ -10,7 +10,7 @@ import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import { ProgressBar } from 'react-native-paper';
 import UrlNotFound from '@/src/components/UrlNotFound';
-import BottomSheetBtn from '@/src/components/bottomSheetBtn';
+import BottomSheetBtn from '@/src/components/BottomSheetBtn';
 
 const webview = () => {
   const { url } = useLocalSearchParams();
@@ -20,9 +20,13 @@ const webview = () => {
   const [key, setKey] = useState(0)
   const [progress, setProgress] = useState(0);
   const [hasError, setHasError] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [canGoForward, setCanGoForward] = useState(false);
+
+  const webViewRef = useRef<WebView>(null)
 
   const bottomShetRef = useRef<BottomSheet>(null)
-  const snapPoints = useMemo(() => ["40%"], [])
+  const snapPoints = useMemo(() => ["60%"], [])
 
   useEffect(() => {
     if (url) {
@@ -41,25 +45,23 @@ const webview = () => {
   }
 
   const isValidUrl = (url: string) => {
-    const pattern = new RegExp(
-      '^(https?:\\/\\/)?' +
-      '((([a-z0-9\\-]+)\\.)+[a-z]{2,}|localhost|' +
-      '((\\d{1,3}\\.){3}\\d{1,3}))' +
-      '(\\:\\d+)?(\\/[-a-z0-9@:%_\\+.~#?&//=]*)?$',
-      'i'
-    );
-    return pattern.test(url);
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
   };
 
   const handleUrl = (text: string) => {
     if (!isValidUrl(text)) {
-      const googleSearchUrl = `google.com/search?q=${text}`;
-      setUrlString(googleSearchUrl)
+      const googleSearchUrl = `https://google.com/search?q=${text}`;
+      setUrlString(googleSearchUrl);
     } else {
       setUrlString(text);
     }
-
-    setQuery(text)
+    setQuery(text);
+    setKey((prevKey) => prevKey + 1)
   };
 
   const goHomePage = () => {
@@ -68,8 +70,19 @@ const webview = () => {
     setUrlString(url)
   };
 
+  const goPreviousPage = () => {
+    if (webViewRef.current && canGoBack) {
+      webViewRef.current.goBack();
+    }
+  }
+
+  const goNextPage = () => {
+    if (webViewRef.current && canGoBack) {
+      webViewRef.current.goForward();
+    }
+  }
+
   const refreshPage = () => {
-    setUrlString(prevUrl => prevUrl)
     setKey(prevKey => prevKey + 1)
   }
 
@@ -101,7 +114,7 @@ const webview = () => {
   return (
     <GestureHandlerRootView style={styles.container}>
       {hasError ? (
-        <UrlNotFound url={urlString} setHasError={setHasError} setUrl={setUrlString}/>
+        <UrlNotFound url={urlString} setHasError={setHasError} setUrl={setUrlString} />
       ) : (
         <>
           <View style={styles.header}>
@@ -124,8 +137,12 @@ const webview = () => {
                 onSubmitEditing={() => handleUrl(query as string)} />
             </View>
 
-            <TouchableOpacity onPress={() => { refreshPage() }}>
-              <Ionicons color={appColors.purple} size={28} name="refresh-circle-sharp" />
+            <TouchableOpacity onPress={() => { goPreviousPage() }}>
+              <Ionicons color={appColors.purple} size={28} name="arrow-back-circle" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => { goNextPage() }}>
+              <Ionicons color={appColors.purple} size={28} name="arrow-forward-circle" />
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => { openOptions() }}>
@@ -138,6 +155,7 @@ const webview = () => {
           )}
 
           <WebView
+            ref={webViewRef}
             source={{ uri: urlString as string }}
             style={styles.webview}
             key={key}
@@ -145,8 +163,12 @@ const webview = () => {
             onLoadProgress={({ nativeEvent }) => {
               setProgress(nativeEvent.progress);
             }}
-            onHttpError={() => {setHasError(true);}}
-            onError={() => {setHasError(true);}}
+            onHttpError={() => { setHasError(true); }}
+            onError={() => { setHasError(true); }}
+            onNavigationStateChange={(navState) => {
+              setCanGoBack(navState.canGoBack);
+              setCanGoForward(navState.canGoForward);
+            }}
           />
         </>
       )}
@@ -159,11 +181,14 @@ const webview = () => {
         enablePanDownToClose={true}
       >
         <View style={styles.bottomSheetContainer}>
-          <BottomSheetBtn onPress={shareUrl} url={url} label={'Copiar link'} icon={'clipboard-outline'} />
-          <BottomSheetBtn onPress={shareUrl} url={url} label={'Salvar como favorito'} icon={'bookmark-outline'} />
-          <BottomSheetBtn onPress={shareUrl} url={url} label={'Compartilhar'} icon={'share-social-outline'} />
+          <View style={{ gap: 10 }}>
+            <BottomSheetBtn onPress={refreshPage} url={url} label={'Recarregar página'} icon={'refresh-outline'} />
+            <BottomSheetBtn onPress={shareUrl} url={url} label={'Copiar link'} icon={'clipboard-outline'} />
+            <BottomSheetBtn onPress={shareUrl} url={url} label={'Salvar como favorito'} icon={'bookmark-outline'} />
+            <BottomSheetBtn onPress={shareUrl} url={url} label={'Compartilhar'} icon={'share-social-outline'} />
+          </View>
 
-          <TouchableOpacity onPress={closeOptions} style={[styles.btnSearchOnWeb, { backgroundColor: appColors.gray, justifyContent: 'center', position: 'relative', bottom: -20 }]}>
+          <TouchableOpacity onPress={closeOptions} style={[styles.btnSearchOnWeb, { backgroundColor: appColors.gray, justifyContent: 'center' }]}>
             <Text style={styles.defaultText}>Cancelar</Text>
           </TouchableOpacity>
         </View>
@@ -229,7 +254,9 @@ const styles = StyleSheet.create({
 
   bottomSheetContainer: {
     gap: 10,
-    padding: 10
+    padding: 10,
+    justifyContent: 'space-between',
+    flex: 1
   },
 
   btnSearchOnWeb: {
